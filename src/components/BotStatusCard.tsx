@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Power, Settings, Trash2 } from "lucide-react";
+import { Power, Settings, Trash2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BotSettingsDialog } from "./BotSettingsDialog";
@@ -23,7 +23,19 @@ interface BotStatusCardProps {
 export const BotStatusCard = ({ isActive, onToggle }: BotStatusCardProps) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+      toast({
+        title: "Данные обновлены",
+        description: "Информация успешно обновлена",
+      });
+    }, 1000);
+  };
 
   const handleDelete = () => {
     toast({
@@ -39,7 +51,18 @@ export const BotStatusCard = ({ isActive, onToggle }: BotStatusCardProps) => {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center justify-between">
             <span>Статус бота</span>
-            <div className={`h-2 w-2 rounded-full ${isActive ? 'bg-success animate-pulse' : 'bg-muted'}`} />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="h-8 w-8"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </Button>
+              <div className={`h-2 w-2 rounded-full ${isActive ? 'bg-success animate-pulse' : 'bg-muted'}`} />
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
