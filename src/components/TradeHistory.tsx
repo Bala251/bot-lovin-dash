@@ -85,7 +85,7 @@ export const TradeHistory = () => {
           <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
-              className="w-full justify-between p-0 hover:bg-transparent"
+              className="w-full justify-between items-center h-14 p-0 hover:bg-transparent"
             >
               <CardTitle className="text-lg flex items-center">
                 <Clock className="mr-2 h-5 w-5" />
