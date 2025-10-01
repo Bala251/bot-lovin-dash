@@ -1,6 +1,9 @@
-import { ArrowUpRight, ArrowDownRight, Clock } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, ArrowDownRight, Clock, ChevronDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 
 interface Trade {
   id: string;
@@ -73,58 +76,76 @@ const mockTrades: Trade[] = [
 ];
 
 export const TradeHistory = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <Card className="glass-card shadow-card border-border/50">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center">
-          <Clock className="mr-2 h-5 w-5" />
-          История сделок
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[280px] pr-4">
-          <div className="space-y-3">
-            {mockTrades.map((trade) => (
-              <div
-                key={trade.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border/30 transition-smooth hover:bg-secondary/70"
-              >
-                <div className="flex items-center gap-3">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CardHeader className="pb-3">
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              className="w-full justify-between p-0 hover:bg-transparent"
+            >
+              <CardTitle className="text-lg flex items-center">
+                <Clock className="mr-2 h-5 w-5" />
+                История сделок
+              </CardTitle>
+              <ChevronDown
+                className={`h-5 w-5 transition-transform ${
+                  isOpen ? "rotate-180" : ""
+                }`}
+              />
+            </Button>
+          </CollapsibleTrigger>
+        </CardHeader>
+        <CollapsibleContent>
+          <CardContent>
+            <ScrollArea className="h-[280px] pr-4">
+              <div className="space-y-3">
+                {mockTrades.map((trade) => (
                   <div
-                    className={`rounded-full p-2 ${
-                      trade.type === "buy" ? "bg-success/20" : "bg-destructive/20"
-                    }`}
+                    key={trade.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border/30 transition-smooth hover:bg-secondary/70"
                   >
-                    {trade.type === "buy" ? (
-                      <ArrowUpRight className="h-4 w-4 text-success" />
-                    ) : (
-                      <ArrowDownRight className="h-4 w-4 text-destructive" />
-                    )}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`rounded-full p-2 ${
+                          trade.type === "buy" ? "bg-success/20" : "bg-destructive/20"
+                        }`}
+                      >
+                        {trade.type === "buy" ? (
+                          <ArrowUpRight className="h-4 w-4 text-success" />
+                        ) : (
+                          <ArrowDownRight className="h-4 w-4 text-destructive" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm">{trade.pair}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {trade.amount} • {trade.price}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {trade.date} • {trade.time}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p
+                        className={`font-semibold text-sm ${
+                          trade.isProfit ? "text-success" : "text-destructive"
+                        }`}
+                      >
+                        {trade.profit}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-sm">{trade.pair}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {trade.amount} • {trade.price}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {trade.date} • {trade.time}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p
-                    className={`font-semibold text-sm ${
-                      trade.isProfit ? "text-success" : "text-destructive"
-                    }`}
-                  >
-                    {trade.profit}
-                  </p>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </CardContent>
+            </ScrollArea>
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 };
