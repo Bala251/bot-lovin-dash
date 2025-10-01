@@ -85,14 +85,14 @@ export const TradeHistory = () => {
           <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
-              className="w-full justify-between items-center p-0 hover:bg-transparent"
+              className="w-full justify-center p-0 hover:bg-transparent relative"
             >
               <CardTitle className="text-lg flex items-center">
                 <Clock className="mr-2 h-5 w-5" />
                 История сделок
               </CardTitle>
               <ChevronDown
-                className={`h-5 w-5 transition-transform ${
+                className={`h-5 w-5 absolute right-0 transition-transform ${
                   isOpen ? "rotate-180" : ""
                 }`}
               />
