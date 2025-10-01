@@ -10,6 +10,7 @@ interface Trade {
   price: string;
   profit: string;
   isProfit: boolean;
+  date: string;
   time: string;
 }
 
@@ -22,6 +23,7 @@ const mockTrades: Trade[] = [
     price: "$45,200",
     profit: "+$85",
     isProfit: true,
+    date: "15.01.2025",
     time: "15:30",
   },
   {
@@ -32,6 +34,7 @@ const mockTrades: Trade[] = [
     price: "$2,850",
     profit: "+$45",
     isProfit: true,
+    date: "15.01.2025",
     time: "14:20",
   },
   {
@@ -42,6 +45,7 @@ const mockTrades: Trade[] = [
     price: "$105",
     profit: "-$20",
     isProfit: false,
+    date: "15.01.2025",
     time: "13:45",
   },
   {
@@ -52,6 +56,7 @@ const mockTrades: Trade[] = [
     price: "$310",
     profit: "+$30",
     isProfit: true,
+    date: "14.01.2025",
     time: "12:10",
   },
   {
@@ -62,6 +67,7 @@ const mockTrades: Trade[] = [
     price: "$0.52",
     profit: "+$15",
     isProfit: true,
+    date: "14.01.2025",
     time: "11:30",
   },
 ];
@@ -100,6 +106,9 @@ export const TradeHistory = () => {
                     <p className="text-xs text-muted-foreground">
                       {trade.amount} • {trade.price}
                     </p>
+                    <p className="text-xs text-muted-foreground">
+                      {trade.date} • {trade.time}
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -110,7 +119,6 @@ export const TradeHistory = () => {
                   >
                     {trade.profit}
                   </p>
-                  <p className="text-xs text-muted-foreground">{trade.time}</p>
                 </div>
               </div>
             ))}
