@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BotStatusCard } from "@/components/BotStatusCard";
 import { MetricsCard } from "@/components/MetricsCard";
+import { BalanceChart } from "@/components/BalanceChart";
 import { TradeHistory } from "@/components/TradeHistory";
 import { Bot } from "lucide-react";
 
@@ -32,6 +33,7 @@ const Index = () => {
       <main className="max-w-2xl mx-auto px-4 space-y-4">
         <BotStatusCard isActive={isBotActive} onToggle={() => setIsBotActive(!isBotActive)} />
         <MetricsCard />
+        <BalanceChart />
         <TradeHistory />
       </main>
     </div>
