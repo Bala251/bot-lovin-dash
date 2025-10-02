@@ -5,8 +5,11 @@
 2. [Быстрый старт](#быстрый-старт)
 3. [Подробная инструкция](#подробная-инструкция)
 4. [Настройка и конфигурация](#настройка-и-конфигурация)
-5. [Управление контейнером](#управление-контейнером)
-6. [Решение проблем](#решение-проблем)
+5. [Подключение домена и настройка HTTPS](#-подключение-домена-и-настройка-https)
+6. [Управление контейнером](#управление-контейнером)
+7. [Решение проблем](#решение-проблем)
+8. [Производственное развертывание](#производственное-развертывание)
+9. [Мониторинг](#мониторинг)
 
 ---
 
@@ -183,26 +186,254 @@ services:
       - .env
 ```
 
-### Использование собственного домена
+## 🌐 Подключение домена и настройка HTTPS
 
-1. **Настройте reverse proxy (например, Nginx на хосте):**
+### Шаг 1: Получение домена
+
+#### Где купить домен:
+1. **Регистраторы доменов:**
+   - [REG.RU](https://www.reg.ru/) - популярный российский регистратор
+   - [Timeweb](https://timeweb.com/) - хостинг + домены
+   - [Namecheap](https://www.namecheap.com/) - международный регистратор
+   - [Cloudflare](https://www.cloudflare.com/products/registrar/) - с защитой от DDoS
+
+2. **Выбор домена:**
+   - `.ru` - для российской аудитории (от 200₽/год)
+   - `.com` - для международной аудитории (от $10/год)
+   - `.io`, `.dev` - для IT-проектов (от $20/год)
+
+3. **Стоимость:** от 200₽ до 2000₽ в год в зависимости от зоны
+
+### Шаг 2: Подготовка сервера
+
+```bash
+# Установите Nginx на хост-машину (не в Docker!)
+sudo apt update
+sudo apt install nginx -y
+
+# Убедитесь, что порты 80 и 443 открыты
+sudo ufw allow 'Nginx Full'
+sudo ufw allow OpenSSH
+sudo ufw enable
+```
+
+### Шаг 3: Настройка DNS
+
+1. **Войдите в панель управления вашего регистратора доменов**
+2. **Найдите раздел "DNS-записи" или "Управление DNS"**
+3. **Добавьте A-записи:**
+
+```
+Тип    Имя    Значение           TTL
+A      @      ВАШ_IP_АДРЕС       3600
+A      www    ВАШ_IP_АДРЕС       3600
+```
+
+**Как узнать IP-адрес вашего сервера:**
+```bash
+curl ifconfig.me
+# или
+hostname -I
+```
+
+4. **Дождитесь распространения DNS (от 5 минут до 48 часов)**
+
+Проверить DNS можно на [WhatsMyDNS.net](https://www.whatsmydns.net/)
+
+### Шаг 4: Настройка Nginx на хосте
+
+Создайте конфигурацию для вашего домена:
+
+```bash
+# Создайте файл конфигурации
+sudo nano /etc/nginx/sites-available/crypto-bot
+```
+
+Вставьте следующую конфигурацию (замените `yourdomain.com`):
+
 ```nginx
 server {
     listen 80;
-    server_name yourdomain.com;
+    listen [::]:80;
+    server_name yourdomain.com www.yourdomain.com;
+
+    # Размер загружаемых файлов
+    client_max_body_size 100M;
 
     location / {
         proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
     }
 }
 ```
 
-2. **Для HTTPS с Let's Encrypt:**
+Активируйте конфигурацию:
+
 ```bash
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d yourdomain.com
+# Создайте символическую ссылку
+sudo ln -s /etc/nginx/sites-available/crypto-bot /etc/nginx/sites-enabled/
+
+# Проверьте конфигурацию
+sudo nginx -t
+
+# Перезапустите Nginx
+sudo systemctl restart nginx
+```
+
+### Шаг 5: Установка SSL-сертификата (HTTPS)
+
+#### Автоматическая настройка с Certbot (рекомендуется):
+
+```bash
+# Установите Certbot
+sudo apt install certbot python3-certbot-nginx -y
+
+# Получите и установите SSL-сертификат
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+
+# Следуйте инструкциям на экране:
+# 1. Введите email для уведомлений
+# 2. Согласитесь с условиями использования
+# 3. Выберите опцию 2 (перенаправление HTTP -> HTTPS)
+```
+
+#### Автоматическое обновление сертификата:
+
+```bash
+# Certbot автоматически настраивает обновление
+# Проверьте таймер обновления:
+sudo systemctl status certbot.timer
+
+# Тестовое обновление (без реального обновления):
+sudo certbot renew --dry-run
+```
+
+#### Ручная настройка SSL (если Certbot не сработал):
+
+```bash
+# Отредактируйте конфигурацию
+sudo nano /etc/nginx/sites-available/crypto-bot
+```
+
+Добавьте SSL-блок:
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name yourdomain.com www.yourdomain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name yourdomain.com www.yourdomain.com;
+
+    # SSL-сертификаты от Let's Encrypt
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/yourdomain.com/chain.pem;
+
+    # Настройки SSL
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    # HSTS (опционально, но рекомендуется)
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    client_max_body_size 100M;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+Перезапустите Nginx:
+```bash
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+### Шаг 6: Проверка работы
+
+1. **Проверьте HTTP:** http://yourdomain.com
+2. **Проверьте HTTPS:** https://yourdomain.com
+3. **Проверьте перенаправление:** HTTP должен автоматически перенаправлять на HTTPS
+
+**Тестирование SSL:**
+```bash
+# Проверьте качество SSL-конфигурации
+curl -I https://yourdomain.com
+```
+
+Или используйте онлайн-инструменты:
+- [SSL Labs Test](https://www.ssllabs.com/ssltest/)
+- [WhyNoPadlock](https://www.whynopadlock.com/)
+
+### Шаг 7: Настройка Docker Compose (опционально)
+
+Если хотите использовать другой порт внутри Docker:
+
+```yaml
+# docker-compose.yml
+services:
+  crypto-bot-app:
+    ports:
+      - "127.0.0.1:3000:80"  # Доступен только localhost
+```
+
+### Использование Cloudflare (дополнительно)
+
+**Преимущества:**
+- Бесплатный SSL-сертификат
+- Защита от DDoS
+- CDN для ускорения загрузки
+- Кэширование контента
+
+**Настройка:**
+
+1. Зарегистрируйтесь на [Cloudflare](https://www.cloudflare.com/)
+2. Добавьте свой домен
+3. Измените NS-записи у вашего регистратора на NS-серверы Cloudflare
+4. В Cloudflare панели:
+   - DNS → Добавьте A-запись с вашим IP
+   - SSL/TLS → Выберите режим "Full" или "Full (strict)"
+   - Speed → Включите Auto Minify
+
+### Полная схема работы
+
+```
+Пользователь → yourdomain.com (DNS)
+                      ↓
+              Cloudflare (опционально)
+                      ↓
+              Ваш сервер (IP)
+                      ↓
+              Nginx (порт 80/443)
+                      ↓
+              Docker контейнер (порт 3000)
+                      ↓
+              Приложение Crypto Bot
 ```
 
 ### Масштабирование
