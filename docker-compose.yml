@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  crypto-bot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    container_name: crypto-bot-dashboard
+    environment:
+      - NODE_ENV=production
+    # Опционально: монтирование логов
+    volumes:
+      - ./logs:/var/log/nginx
