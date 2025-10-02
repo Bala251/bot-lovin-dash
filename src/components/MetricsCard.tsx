@@ -7,15 +7,19 @@ interface MetricProps {
   change?: string;
   isPositive?: boolean;
   icon: React.ReactNode;
+  secondaryValue?: string;
 }
 
-const Metric = ({ title, value, change, isPositive, icon }: MetricProps) => (
+const Metric = ({ title, value, change, isPositive, icon, secondaryValue }: MetricProps) => (
   <Card className="glass-card shadow-card border-border/50">
     <CardContent className="p-4">
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">{title}</p>
           <p className="text-2xl font-bold">{value}</p>
+          {secondaryValue && (
+            <p className="text-sm text-muted-foreground">{secondaryValue}</p>
+          )}
           {change && (
             <div className={`flex items-center text-sm ${isPositive ? 'text-success' : 'text-destructive'}`}>
               {isPositive ? (
@@ -41,6 +45,7 @@ export const MetricsCard = () => {
       <Metric
         title="Баланс"
         value="$12,450"
+        secondaryValue="≈ 1,182,750 ₽"
         icon={<Wallet className="h-5 w-5 text-primary" />}
       />
       <Metric
