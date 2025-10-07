@@ -3,6 +3,7 @@ import { BotStatusCard } from "@/components/BotStatusCard";
 import { MetricsCard } from "@/components/MetricsCard";
 import { BalanceChart } from "@/components/BalanceChart";
 import { TradeHistory } from "@/components/TradeHistory";
+import { ProfitCalculator } from "@/components/ProfitCalculator";
 import { Bot } from "lucide-react";
 
 const Index = () => {
@@ -35,6 +36,7 @@ const Index = () => {
         <MetricsCard />
         <BalanceChart />
         <TradeHistory />
+        <ProfitCalculator />
       </main>
     </div>
   );
