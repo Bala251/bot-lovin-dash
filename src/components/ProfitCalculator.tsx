@@ -31,7 +31,7 @@ const chartConfig = {
 };
 
 export const ProfitCalculator = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const profitData = generateProfitData(10000);
   const initialAmount = profitData[0].profit;
   const finalAmount = profitData[12].profit;
