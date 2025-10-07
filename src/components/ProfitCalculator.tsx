@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 import { ChevronDown, Calculator } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -41,19 +42,24 @@ export const ProfitCalculator = ({ initialBalance }: { initialBalance: number })
   return (
     <Card className="glass-card">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger className="w-full">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <div className="flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Калькулятор прибыли</CardTitle>
-            </div>
-            <ChevronDown
-              className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
-                isOpen ? "rotate-180" : ""
-              }`}
-            />
-          </CardHeader>
-        </CollapsibleTrigger>
+        <CardHeader className="pb-3">
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              className="w-full justify-between p-0 hover:bg-transparent"
+            >
+              <CardTitle className="text-lg flex items-center">
+                <Calculator className="mr-2 h-5 w-5 text-primary" />
+                Калькулятор прибыли
+              </CardTitle>
+              <ChevronDown
+                className={`h-5 w-5 transition-transform ${
+                  isOpen ? "rotate-180" : ""
+                }`}
+              />
+            </Button>
+          </CollapsibleTrigger>
+        </CardHeader>
 
         <CollapsibleContent>
           <CardContent className="space-y-4">
