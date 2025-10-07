@@ -8,6 +8,8 @@ import { Bot } from "lucide-react";
 
 const Index = () => {
   const [isBotActive, setIsBotActive] = useState(true);
+  const currentBalance = 12450; // Current balance from metrics
+
 
   return (
     <div className="min-h-screen bg-background pb-6">
@@ -36,7 +38,7 @@ const Index = () => {
         <MetricsCard />
         <BalanceChart />
         <TradeHistory />
-        <ProfitCalculator />
+        <ProfitCalculator initialBalance={currentBalance} />
       </main>
     </div>
   );

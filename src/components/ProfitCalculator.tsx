@@ -6,7 +6,7 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 // Generate profit data with 7% monthly growth for 12 months
-const generateProfitData = (initialAmount: number = 10000) => {
+const generateProfitData = (initialAmount: number) => {
   const data = [];
   let currentAmount = initialAmount;
   const monthlyGrowthRate = 0.07; // 7% growth
@@ -30,9 +30,9 @@ const chartConfig = {
   },
 };
 
-export const ProfitCalculator = () => {
+export const ProfitCalculator = ({ initialBalance }: { initialBalance: number }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const profitData = generateProfitData(10000);
+  const profitData = generateProfitData(initialBalance);
   const initialAmount = profitData[0].profit;
   const finalAmount = profitData[12].profit;
   const totalGrowth = finalAmount - initialAmount;

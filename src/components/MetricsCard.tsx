@@ -40,6 +40,8 @@ const Metric = ({ title, value, change, isPositive, icon, secondaryValue }: Metr
 );
 
 export const MetricsCard = () => {
+  const balance = 12450; // Extract balance value
+  
   return (
     <div className="grid grid-cols-2 gap-3">
       <Metric
