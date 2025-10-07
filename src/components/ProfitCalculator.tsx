@@ -49,7 +49,7 @@ export const ProfitCalculator = ({ initialBalance }: { initialBalance: number })
               className="w-full justify-between p-0 hover:bg-transparent"
             >
               <CardTitle className="text-lg flex items-center">
-                <Calculator className="mr-2 h-5 w-5 text-primary" />
+                <Calculator className="mr-2 h-5 w-5" />
                 Калькулятор прибыли
               </CardTitle>
               <ChevronDown
