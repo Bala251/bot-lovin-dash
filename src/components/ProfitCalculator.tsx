@@ -26,7 +26,7 @@ const generateProfitData = (initialAmount: number = 10000) => {
 const chartConfig = {
   profit: {
     label: "Прибыль",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--primary))",
   },
 };
 
@@ -80,8 +80,8 @@ export const ProfitCalculator = () => {
                 <AreaChart data={profitData}>
                   <defs>
                     <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="hsl(var(--chart-1))" stopOpacity={0} />
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted/20" vertical={false} />
@@ -109,7 +109,7 @@ export const ProfitCalculator = () => {
                   <Area
                     type="monotone"
                     dataKey="profit"
-                    stroke="hsl(var(--chart-1))"
+                    stroke="hsl(var(--primary))"
                     strokeWidth={2}
                     fill="url(#profitGradient)"
                   />
