@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BotStatusCard } from "@/components/BotStatusCard";
+import { SubscriptionCard } from "@/components/SubscriptionCard";
 import { MetricsCard } from "@/components/MetricsCard";
 import { BalanceChart } from "@/components/BalanceChart";
 import { TradeHistory } from "@/components/TradeHistory";
@@ -8,6 +9,7 @@ import { Bot } from "lucide-react";
 
 const Index = () => {
   const [isBotActive, setIsBotActive] = useState(true);
+  const [subscriptionPlan] = useState<"free" | "premium">("free"); // Change to "premium" for testing
   const currentBalance = 12450; // Current balance from metrics
 
 
@@ -35,6 +37,10 @@ const Index = () => {
       {/* Main Content */}
       <main className="max-w-2xl mx-auto px-4 space-y-4">
         <BotStatusCard isActive={isBotActive} onToggle={() => setIsBotActive(!isBotActive)} />
+        <SubscriptionCard 
+          plan={subscriptionPlan} 
+          expiryDate={subscriptionPlan === "premium" ? "25.11.2025" : undefined}
+        />
         <MetricsCard />
         <BalanceChart />
         <TradeHistory />
